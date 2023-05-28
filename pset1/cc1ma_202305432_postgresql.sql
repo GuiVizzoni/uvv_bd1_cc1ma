@@ -30,7 +30,6 @@ ALLOW_CONNECTIONS = 'true';
 
 COMMENT ON DATABASE uvv IS 'Banco de dados utilizado para lojas uvv';
 
-
 -- Conectando ao usuário "guilherme".	
 
 SET role guilherme;
@@ -41,7 +40,7 @@ SET role guilherme;
 
 -- Deletando o esquema "lojas" caso ele já exista.
 
-DROP SCHEMA IF EXISTS lojas
+DROP SCHEMA IF EXISTS lojas CASCADE
 ;
 
 -- Criação do esquema lojas, onde o usuário "guilherme" pode criar tabelas.
