@@ -323,93 +323,61 @@ ON DELETE NO ACTION
 ON UPDATE NO ACTION
 NOT DEFERRABLE;
 
---CRIANDO REGRA QUE EM PEDIDOS, A COLUNA STATUS ACEITE SOMENTE: CANCELADO, COMPLETO, ABERTO, PAGO, REEMBOLSADO, ENVIADO
+--Criação de comando que na tabela "pedidos", a coluna "status" só aceite os seguintes status: CANCELADO, COMPLETO, ABERTO, PAGO, REEMBOLSADO e ENVIADO.
 
 ALTER TABLE lojas.pedidos
 ADD CONSTRAINT checar_status
 CHECK (status IN ('CANCELADO', 'COMPLETO', 'ABERTO', 'PAGO', 'REEMBOLSADO', 'ENVIADO'));
 
---CRIANDO REGRA QUE EM ENVIOS, A COLUNA STATUS ACEITE SOMENTE: CRIADO, ENVIADO, TRANSITO, ENTREGUE
+--Criação de comando que na tabela "envios", a coluna "status só aceite os seguintes status: CRIADO, ENVIADO, TRANSITO, ENTREGUE.
 
 ALTER TABLE lojas.envios
 ADD CONSTRAINT checar_status_dos_envios
 CHECK (status IN ('CRIADO', 'ENVIADO', 'TRÂNSITO', 'ENTREGUE'));
 
---CRIANDO UMA REGRA QUE ME GARANTE QUE PELO MENOS UMAS DAS COLUNAS "ENDERECO_WEB" OU "ENDERECO_FISICO" ESTEJAM PREENCHIDAS
+--Criação de comando que faça ao menos um endereço ser adicionado.
 
 ALTER TABLE lojas.lojas
 ADD CONSTRAINT endereco_unico
 CHECK (endereco_web IS NOT NULL OR endereco_fisico IS NOT NULL);
 
---CRIANDO UMA REGRA QUE ME GARANTE QUE O PREÇO UNITÁRIO NÃO SEJA NEGATIVO
+--Criação de comando que impede do preço unitario ser negativo.
 
 ALTER TABLE lojas.produtos
-ADD CONSTRAINT preco_unitario_somente_positivo
+ADD CONSTRAINT check_preco_unitario
 CHECK (preco_unitario >= 0);
 
---CRIANDO UMA REGRA QUE ME GARANTE QUE O ESTOQUE NÃO SEJA NEGATIVO/essa ta repetida la em cima! cuidado ae
+--Criação de comando que impede do estoque ser negativo.
 
 ALTER TABLE lojas.estoques
-ADD CONSTRAINT estoques_somente_positivos
+ADD CONSTRAINT check_estoques
 CHECK (quantidade >= 0);
 
--- Comando definindo o formato em que é adicionada a data.
+-- Criação de comando definindo o formato em que é adicionada a data.
 
 ALTER TABLE lojas.pedidos
-ADD CONSTRAINT check_formatacao_data_hora_ CHECK (TO_CHAR(data_hora, 'DD-MM-YYYY') = TO_CHAR(data_hora, 'DD-MM-YYYY'));
+ADD CONSTRAINT check_formatacao_data_hora
+CHECK (TO_CHAR(data_hora, 'DD-MM-YYYY') = TO_CHAR(data_hora, 'DD-MM-YYYY'));
 
--- Inserção de Dados na tabela produtos.
+-- Criação de mínimo e máximo que pode se inserir na latitude.
 
-	INSERT INTO Lojas.produtos (produto_id, nome, preco_unitario, detalhes, imagem, imagem_mime_type, imagem_arquivo, imagem_charset, imagem_ultima_atualizacao)
-	VALUES 
-	    (1, 'Produto 1', 10.99, 'Detalhes do produto 1', NULL, NULL, NULL, NULL, NULL),
-	    (2, 'Produto 2', 15.99, 'Detalhes do produto 2', NULL, NULL, NULL, NULL, NULL),
-	    (3, 'Produto 3', 20.99, 'Detalhes do produto 3', NULL, NULL, NULL, NULL, NULL);
+ALTER TABLE lojas.lojas
+ADD CONSTRAINT check_latitude
+CHECK (latitude >= -90 AND
+       latitude <= 90)
+;
 
--- Inserção de Dados na tabela lojas.
+-- Criação de mínimo e máximo que pode se inserir na longitude.
 
-	INSERT INTO Lojas.lojas (loja_id, nome, endereco_web, endereco_fisico, latitude, longitude, logo, logo_mime_type, logo_arquivo, logo_charset, logo_ultima_atualizacao)
-	VALUES 
-    		(1, 'Loja 1', 'https://www.loja1.com', null, 123.456, 789.123, null, null, null, null, null),
-    		(2, 'Loja 2', null, 'Rua da Loja 2', 456.789, 321.987, null, null, null, null, null),
-    		(3, 'Loja 3', 'https://www.loja3.com', 'Rua da Loja 3', 789.123, 654.321, null, null, null, null, null);
+ALTER TABLE lojas.lojas
+ADD CONSTRAINT check_longitude
+CHECK (longitude >= -180 AND
+       longitude <= 180)
+;
 
--- Inserção de Dados na tabela estoques.
+-- Criação de um comando que impede que a data da coluna "imagem_ultima_atualizacao" esteja em uma data futura.
 
-	INSERT INTO Lojas.estoques (estoque_id, loja_id, produto_id, quantidade)
-	VALUES 
-	    (1, 1, 1, 100),
-	    (2, 2, 2, 200),
-	    (3, 3, 3, 300);
-
--- Inserção de Dados na tabela clientes.
-	
-	INSERT INTO Lojas.clientes (cliente_id, email, nome, telefone1, telefone2, telefone3)
-	VALUES 
-	    (1, 'cliente1@example.com', 'Cliente 1', '123456789', NULL, NULL),
-	    (2, 'cliente2@example.com', 'Cliente 2', '987654321', NULL, NULL),
-	    (3, 'cliente3@example.com', 'Cliente 3', '456789123', NULL, NULL);
-
--- Inserção de Dados na tabela envios.
-
-	INSERT INTO Lojas.envios (envio_id, loja_id, cliente_id, endereco_entrega, status)
-	VALUES 
-	    (1, 1, 1, 'Endereço de entrega 1', 'ENVIADO'),
-	    (2, 2, 2, 'Endereço de entrega 2', 'TRANSITO'),
-	    (3, 3, 3, 'Endereço de entrega 3', 'ENTREGUE');
-
--- Inserção de Dados na tabela pedidos.	
-
-	INSERT INTO Lojas.pedidos (pedido_id, data_hora, cliente_id, status, loja_id)
-	VALUES 
-	    (1, current_timestamp, 1, 'ABERTO', 1),
-	    (2, current_timestamp, 2, 'COMPLETO', 2),
-	    (3, current_timestamp, 3, 'PAGO', 3);
-
--- Inserção de Dados na tabela pedidos_itens.
-
-	INSERT INTO Lojas.pedidos_itens (pedido_id, produto_id, numero_da_linha, preco_unitario, quantidade, envio_id)
-	VALUES 
-	    (1, 1, 1, 9.99, 2, 1),
-	    (2, 2, 2, 12.99, 3, 2),
-	    (3, 3, 3, 15.99, 1, 3);
+ALTER TABLE lojas.produtos
+ADD CONSTRAINT check_hora_atualizacao
+CHECK (imagem_ultima_atualizacao <= current_timestamp)
+;
