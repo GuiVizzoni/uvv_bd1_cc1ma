@@ -110,6 +110,18 @@ COMMENT ON COLUMN lojas.pedidos.cliente_id IS 'chave estrangeira do cliente_id d
 COMMENT ON COLUMN lojas.pedidos.status IS 'Identifica o status do pedido';
 COMMENT ON COLUMN lojas.pedidos.loja_id IS 'chave estrangeira da loja_id da tabela lojas';
 
+--Criação de comando que na tabela "pedidos", a coluna "status" só aceite os seguintes status: CANCELADO, COMPLETO, ABERTO, PAGO, REEMBOLSADO e ENVIADO.
+
+ALTER TABLE lojas.pedidos
+ADD CONSTRAINT checar_status
+CHECK (status IN ('CANCELADO', 'COMPLETO', 'ABERTO', 'PAGO', 'REEMBOLSADO', 'ENVIADO'));
+
+-- Criação de comando definindo o formato em que é adicionada a data.
+
+ALTER TABLE lojas.pedidos
+ADD CONSTRAINT check_formatacao_data_hora
+CHECK (TO_CHAR(data_hora, 'DD-MM-YYYY') = TO_CHAR(data_hora, 'DD-MM-YYYY'));
+
 --Criação da tabela "lojas".
 
 CREATE TABLE lojas.lojas (
@@ -145,6 +157,26 @@ COMMENT ON COLUMN lojas.lojas.logo_arquivo IS 'Identifica o link do arquivo da l
 COMMENT ON COLUMN lojas.lojas.logo_charset IS 'Identifica a codificação da logo da loja';
 COMMENT ON COLUMN lojas.lojas.logo_ultima_atualizacao IS 'Identifica a data da ultima atualização da logo da loja';
 
+-- Criação de mínimo e máximo que pode se inserir na latitude.
+
+ALTER TABLE lojas.lojas
+ADD CONSTRAINT check_latitude
+CHECK (latitude >= -90 AND
+       latitude <= 90);
+
+-- Criação de mínimo e máximo que pode se inserir na longitude.
+
+ALTER TABLE lojas.lojas
+ADD CONSTRAINT check_longitude
+CHECK (longitude >= -180 AND
+       longitude <= 180);
+
+--Criação de comando que faça ao menos um endereço ser adicionado.
+
+ALTER TABLE lojas.lojas
+ADD CONSTRAINT endereco_unico
+CHECK (endereco_web IS NOT NULL OR endereco_fisico IS NOT NULL);
+
 --Criação da tabela "produtos".
 
 CREATE TABLE lojas.produtos (
@@ -176,6 +208,19 @@ COMMENT ON COLUMN lojas.produtos.imagem_arquivo IS 'Identifica o link da imagem 
 COMMENT ON COLUMN lojas.produtos.imagem_charset IS 'Identifica a codificação da imagem do produto';
 COMMENT ON COLUMN lojas.produtos.imagem_ultima_atualizacao IS 'Identifica a data da ultima atualização/alteração da imagem do produto';
 
+-- Criação de um comando que impede que a data da coluna "imagem_ultima_atualizacao" esteja em uma data futura.
+
+ALTER TABLE lojas.produtos
+ADD CONSTRAINT check_hora_atualizacao
+CHECK (imagem_ultima_atualizacao <= current_timestamp)
+;
+
+--Criação de comando que impede do preço unitario ser negativo.
+
+ALTER TABLE lojas.produtos
+ADD CONSTRAINT check_preco_unitario
+CHECK (preco_unitario >= 0);
+
 --Criação da tabela "estoques".
 
 CREATE TABLE lojas.estoques (
@@ -196,6 +241,12 @@ COMMENT ON COLUMN lojas.estoques.estoque_id IS 'Identificação de estoques da l
 COMMENT ON COLUMN lojas.estoques.loja_id IS 'Chave estrangeira da tabela lojas';
 COMMENT ON COLUMN lojas.estoques.produto_id IS 'Chave estrangeira da tabela produtos';
 COMMENT ON COLUMN lojas.estoques.quantidade IS 'Informa a quantidade de produtos no estoque';
+
+--Criação de comando que impede do estoque ser negativo.
+
+ALTER TABLE lojas.estoques
+ADD CONSTRAINT check_estoques
+CHECK (quantidade >= 0);
 
 --Criação da tabela "envios".
 
@@ -219,6 +270,12 @@ COMMENT ON COLUMN lojas.envios.loja_id IS 'Chave estrangeira da tabela lojas';
 COMMENT ON COLUMN lojas.envios.cliente_id IS 'Chave estrangeira da tabela clientes';
 COMMENT ON COLUMN lojas.envios.endereco_entrega IS 'Informa o endereço da entrega para envio';
 COMMENT ON COLUMN lojas.envios.status IS 'Informa o status do envio';
+
+--Criação de comando que na tabela "envios", a coluna "status só aceite os seguintes status: CRIADO, ENVIADO, TRANSITO, ENTREGUE.
+
+ALTER TABLE lojas.envios
+ADD CONSTRAINT checar_status_dos_envios
+CHECK (status IN ('CRIADO', 'ENVIADO', 'TRÂNSITO', 'ENTREGUE'));
 
 --Criação da tabela "pedidos_itens".
 
@@ -325,62 +382,3 @@ REFERENCES lojas.pedidos (pedido_id)
 ON DELETE NO ACTION
 ON UPDATE NO ACTION
 NOT DEFERRABLE;
-
---Criação de comando que na tabela "pedidos", a coluna "status" só aceite os seguintes status: CANCELADO, COMPLETO, ABERTO, PAGO, REEMBOLSADO e ENVIADO.
-
-ALTER TABLE lojas.pedidos
-ADD CONSTRAINT checar_status
-CHECK (status IN ('CANCELADO', 'COMPLETO', 'ABERTO', 'PAGO', 'REEMBOLSADO', 'ENVIADO'));
-
---Criação de comando que na tabela "envios", a coluna "status só aceite os seguintes status: CRIADO, ENVIADO, TRANSITO, ENTREGUE.
-
-ALTER TABLE lojas.envios
-ADD CONSTRAINT checar_status_dos_envios
-CHECK (status IN ('CRIADO', 'ENVIADO', 'TRÂNSITO', 'ENTREGUE'));
-
---Criação de comando que faça ao menos um endereço ser adicionado.
-
-ALTER TABLE lojas.lojas
-ADD CONSTRAINT endereco_unico
-CHECK (endereco_web IS NOT NULL OR endereco_fisico IS NOT NULL);
-
---Criação de comando que impede do preço unitario ser negativo.
-
-ALTER TABLE lojas.produtos
-ADD CONSTRAINT check_preco_unitario
-CHECK (preco_unitario >= 0);
-
---Criação de comando que impede do estoque ser negativo.
-
-ALTER TABLE lojas.estoques
-ADD CONSTRAINT check_estoques
-CHECK (quantidade >= 0);
-
--- Criação de comando definindo o formato em que é adicionada a data.
-
-ALTER TABLE lojas.pedidos
-ADD CONSTRAINT check_formatacao_data_hora
-CHECK (TO_CHAR(data_hora, 'DD-MM-YYYY') = TO_CHAR(data_hora, 'DD-MM-YYYY'));
-
--- Criação de mínimo e máximo que pode se inserir na latitude.
-
-ALTER TABLE lojas.lojas
-ADD CONSTRAINT check_latitude
-CHECK (latitude >= -90 AND
-       latitude <= 90)
-;
-
--- Criação de mínimo e máximo que pode se inserir na longitude.
-
-ALTER TABLE lojas.lojas
-ADD CONSTRAINT check_longitude
-CHECK (longitude >= -180 AND
-       longitude <= 180)
-;
-
--- Criação de um comando que impede que a data da coluna "imagem_ultima_atualizacao" esteja em uma data futura.
-
-ALTER TABLE lojas.produtos
-ADD CONSTRAINT check_hora_atualizacao
-CHECK (imagem_ultima_atualizacao <= current_timestamp)
-;
