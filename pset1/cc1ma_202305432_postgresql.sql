@@ -1,4 +1,4 @@
---Entrando no PostgreSQL para criação do usuário e do banco de dados.
+--Entrando no usuário Postgres para criação do usuário e do banco de dados.
 
 \c "host=localhost user=postgres password=computacao@raiz";
 
