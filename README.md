@@ -12,7 +12,7 @@ Um Problem Set (PSET) é um conjunto de problemas e tarefas difíceis que tem o 
 - Oracle VM VirtualBox (dbserver2)
 - Terminal Linux
 - SQL Power Architect
-- PostgreSQL **Comand Line**
+- PostgreSQL Comand Line
 - DBeaver
 
 ### Considerações Finais
