@@ -1,7 +1,3 @@
---Entrando no usuário Postgres para criação do usuário e do banco de dados.
-
-\c "host=localhost user=postgres password=computacao@raiz";
-
 --Deletando o banco de dados uvv caso ele já exista.
 
 DROP DATABASE IF EXISTS uvv;
