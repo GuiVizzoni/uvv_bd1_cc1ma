@@ -8,7 +8,7 @@
 Um Problem Set (PSET) é um conjunto de problemas e tarefas difíceis que tem o foco de levar o aluno a estudar e  compreender a matéria, ela se divide em duas partes: a manuscrita (entregue em papel almaço) e online (feito a base de códigos script na máquina virtual e seus outros aplicativos).
 
 ### Programas Utilizados para realização do Pset:
-- Github Desktop
+- Github
 - Oracle VM VirtualBox (dbserver2)
 - Terminal Linux
 - SQL Power Architect
